@@ -1,0 +1,219 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  usuario_id             Int          @id@default(autoincrement())
+  nombre1                String
+  nombre2                String?
+  apellido1              String
+  apellido2              String
+  usuario_iniciales      String       @unique
+  email                  String       @unique
+  email_adicional        String       @unique
+  idioma                 Idioma       @relation(fields:[idioma_id],references:[idioma_id])
+  idioma_id              Int
+  uso_horario            String
+  genero                 Genero       @relation(fields:[genero_id],references:[genero_id])
+  genero_id              Int
+  clientes               Clientes[]
+}
+
+model Genero{
+  genero_id             Int           @id@default(autoincrement())
+  genero_nombre         String @unique
+  usuarios              Usuario[]
+}
+
+model Idioma{
+  idioma_id              Int          @id@default(autoincrement())
+  idioma_nombre          String
+  idioma_clave           String   @unique
+  usuarios               Usuario[]
+  comprobantes          Comprobantes[]
+  condiciondepago       Condiciondepago[]
+
+}
+
+model Monedas{
+  moneda_id                 Int     @id@default(autoincrement())
+  moneda_clave              String? @unique
+  moneda_nombre             String? @unique
+  moneda_nombre_singular    String?
+  moneda_nombre_plural      String?
+  moneda_denominacion       String?
+  moneda_simbolo            String?
+  moneda_decimales          String
+  moneda_porcentaje_variacion String
+  clientes                  Clientes[]
+  Comprobantes          Comprobantes[]
+  Movimientos           Movimientos[]
+
+}
+
+model Clientes{
+  operacion_id         Int          @id@default(autoincrement())
+  usuario              Usuario      @relation(fields:[usuario_id],references:[usuario_id])
+  usuario_id           Int 
+  cliente              String
+  emisor_id            Int
+  montorecibido        Int
+  moneda               Monedas      @relation(fields:[moneda_id],references:[moneda_id])
+  moneda_id            Int
+  tipodecambio         Int
+  formadepago          Formasdepago @relation(fields:[forma_pago_id],references:[forma_pago_id])
+  forma_pago_id        Int
+  fecha                String
+  status               Status       @relation(fields:[status_id],references:[status_id])
+  status_id            Int
+  numeroperacion       String
+  anexoclientes        Anexoclientes[]
+}
+
+model Anexoclientes{
+  anexo_id                  Int      @id@default(autoincrement())
+  observaciones             String?
+  cuentabancaria            String?
+  fechadeingreso            String?
+  fechadeconfirmacion       String?
+  observacionesalconfirmar  String?
+  operacion                 Clientes  @relation(fields:[operacion_id],references:[operacion_id])
+  operacion_id              Int
+}
+
+
+model Formasdepago{
+  forma_pago_id         Int         @id@default(autoincrement())
+  forma_clave           String  @unique
+  forma_tipo            String
+  clientes              Clientes[]
+  Comprobantes          Comprobantes[]
+  Movimientos           Movimientos[]
+}
+
+model Status{
+  status_id             Int         @id@default(autoincrement())
+  status_tipo           String   @unique
+  clientes              Clientes[]
+  Comprobantes          Comprobantes[]
+  Movimientos           Movimientos[]
+}
+
+model Cfdi{
+  cfdi_id               Int @id@default(autoincrement())
+  cfdi_clave            String @unique
+  cfdi_descripcion      String
+  Comprobantes          Comprobantes[]
+}
+
+model Regimen{
+  regimen_id            Int @id@default(autoincrement())
+  regimen_tipo          String @unique
+  Comprobantes          Comprobantes[]
+}
+
+model Metododepago{
+  metodopago_id         Int @id@default(autoincrement())
+  metodopago_clave      String  @unique
+  metodopago_tipo       String
+  Comprobantes          Comprobantes[]
+
+}
+
+model Tipodecomprobante{
+  tipocomprobante_id          Int @id@default(autoincrement())
+  tipocomprobante_clave       String @unique
+  tipocomprobante_descripcion String
+  Comprobantes          Comprobantes[]
+
+}
+
+model Emisores{
+  emisor_id       Int @id@default(autoincrement())
+  emisor_nombre   String @unique
+  Comprobantes          Comprobantes[]
+  Movimientos           Movimientos[]
+}
+
+model Receptores{
+    receptor_id           Int @default(autoincrement())@id
+    receptor_nombre       String @unique
+    Comprobantes          Comprobantes[]
+
+}
+
+model Comprobantes{
+  comprobante_id        Int @id@default(autoincrement())
+  emisor                Emisores @relation(fields:[emisor_id],references:[emisor_id])
+  emisor_id             Int
+  receptor              Receptores @relation(fields:[receptor_id],references:[receptor_id])
+  receptor_id           Int
+
+  fecha_emision              String?
+  folio_usuario              String?
+  total                      String?
+  subtotal                   String?
+  tipo_cambio                String?
+  saldo_insoluto             String?
+  descuento                  String?
+  total_traslado             String?
+  total_retenido             String?
+  comentario                 String?
+  fecha_vencimiento          String?
+  lugar_expedicion           String?
+  
+  
+  status_comprobante_pago     Status @relation(fields:[status_comprobante_pago_id],references:[status_id])
+  status_comprobante_pago_id  Int
+  tipo_comprobante            Tipodecomprobante @relation(fields:[tipo_comprobante_id],references:[tipocomprobante_id])
+  tipo_comprobante_id          Int
+  moneda                      Monedas @relation(fields:[moneda_id],references:[moneda_id])
+  moneda_id                   Int
+  idioma                      Idioma@relation(fields:[idioma_id],references:[idioma_id])
+  idioma_id                   Int
+  metodo_pago                 Metododepago @relation(fields:[metodo_pago_id],references:[metodopago_id])
+  metodo_pago_id               Int
+  forma_pago                  Formasdepago @relation(fields:[forma_pago_id],references:[forma_pago_id])
+  forma_pago_id               Int
+  
+  condicion_pago_id           String?
+
+  uso_cfdi                    Cfdi @relation(fields:[uso_cfdi_id],references:[cfdi_id])
+  uso_cfdi_id                 Int
+  regimen_fiscal              Regimen @relation(fields:[regimen_fiscal_id],references:[regimen_id])
+  regimen_fiscal_id           Int
+}
+
+model Movimientos{
+  movimiento_id         Int @id@default(autoincrement())
+  fecha                 String
+  concepto              String
+  referencia            String
+  monto                 Float
+  tipo_cambio           Float
+  emisor                Emisores @relation(fields:[emisor_id],references:[emisor_id])
+  emisor_id             Int
+  moneda                Monedas @relation(fields:[moneda_id],references:[moneda_id])
+  moneda_id             Int
+  forma_pago            Formasdepago @relation(fields:[forma_pago_id],references:[forma_pago_id])
+  forma_pago_id         Int
+  status                Status @relation(fields:[status_id],references:[status_id])
+  status_id             Int
+}
+
+model Condiciondepago{
+  condicion_pago_id                 Int @id@default(autoincrement())
+  condicion_pago_nombre             String
+  condicion_pago_dias_para_vencer   Int
+  idioma                            Idioma @relation(fields:[idioma_id],references:[idioma_id])
+  idioma_id                         Int
+  condicion_pago_status             String
+}
