@@ -9,20 +9,24 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    async jwt(token, user, account = {}, profile, isNewUser) {
-      if ( account.provider && !token[account.provider] ) {
-        token[account.provider] = {};
+    jwt: async ({ token, user, account={}, profile, isNewUser }) => {
+  
+      if(account.provider && !token[account.provider]){
+        token[account.provider]={}
       }
-
-      if ( account.accessToken ) {
-        token[account.provider].accessToken = account.accessToken;
+      if(account.oauth_token){
+        token[account.provider].oauth_token=account.oauth_token
       }
-
-      if ( account.refreshToken ) {
-        token[account.provider].refreshToken = account.refreshToken;
+      if(account.oauth_token_secret){
+        token[account.provider].oauth_token_secret=account.oauth_token_secret
       }
-      return token;
-    },
+      user && (token.user = user)
+      return token
+  },
+  session: async ({ session, token }) => {
+      session.user = token.user
+      return session
+  }
   },
   secret: process.env.NEXTAUTH_SECRET
 });
