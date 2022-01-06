@@ -2,7 +2,7 @@ import { TwitterClient } from 'twitter-api-client'
 import {getSession} from 'next-auth/react'
 import {getToken} from 'next-auth/jwt'
 
-export default async (req,res)=>{
+const tweettexto= async (req,res)=>{
     const body=JSON.parse(req.body)
     const {status}= body
     console.log(status)
@@ -35,3 +35,5 @@ export default async (req,res)=>{
         })
     }
 }
+
+export default tweettexto

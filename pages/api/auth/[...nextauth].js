@@ -7,6 +7,21 @@ export default NextAuth({
       clientId: process.env.TWITTER_CONSUMER_KEY,
       clientSecret: process.env.TWITTER_CONSUMER_SECRET
     }),
+    {
+      id:"pinterest",
+      name:"Pinterest",
+      type:"oauth",
+      authorization:{
+          url:"https://www.pinterest.com/oauth",
+          params:{
+              scope:"user_accounts:read,boards:read,pins:read,ads:read,boards:write,pins:write"
+          }
+      },
+      accessTokenUrl:"https://api.pinterest.com/v5/oauth/token",
+      clientId:process.env.AUTH0_PINTEREST_ID,
+      clientSecret:process.env.AUTH0_PINTEREST_SECRET,
+      userinfo:"https://api.pinterest.com/v5/user_account"
+  }
   ],
   callbacks: {
     jwt: async ({ token, user, account={}, profile, isNewUser }) => {

@@ -2,7 +2,7 @@ import { TwitterClient } from 'twitter-api-client'
 import {getSession} from 'next-auth/react'
 import {getToken} from 'next-auth/jwt'
 
-export default async (req,res)=>{
+const lastfive= async (req,res)=>{
     //const body=JSON.parse(req.body)
     //const {query}= body
     const session= await getSession({req})
@@ -35,3 +35,5 @@ export default async (req,res)=>{
     }
 
 }
+
+export default lastfive
